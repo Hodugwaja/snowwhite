@@ -1,0 +1,26 @@
+{
+  "name": "snowwhite",
+  "version": "1.0.0",
+  "description": "백설이",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hodugwaja/snowwhite.git"
+  },
+  "author": "hutaogwaja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hodugwaja/snowwhite/issues"
+  },
+  "homepage": "https://github.com/Hodugwaja/snowwhite#readme",
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
+}
