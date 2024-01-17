@@ -1,26 +1,20 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
-
-// 인스턴스 생성
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-
 client.commands = new Collection();
-
-
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const foldersPath = path.join(__dirname, 'commands'); // commands 폴더 내로 경로 지정
+const commandFolders = fs.readdirSync(foldersPath); // 경로저장
 
 for (const folder of commandFolders) {
-	const commandsPath = path.join(foldersPath, folder);
-	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	const commandsPath = path.join(foldersPath, folder); // 폴더 내의 경로 가져오기
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js')); // events폴더 내에 .js로 끝나는(확장자가 js파일)만 나오도록 필터링
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
 		} else {
@@ -29,32 +23,17 @@ for (const folder of commandFolders) {
 	}
 }
 
-// 완료된 후에 단 한번만 작동
-client.once(Events.ClientReady, readyClient => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+const eventsPath = path.join(__dirname, 'events'); // events 폴더 내fh 경로 지정
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js')); // events폴더 내에 .js로 끝나는(확장자가 js파일)만 나오도록 필터링
 
-client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
-
-	const command = interaction.client.commands.get(interaction.commandName);
-
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
+}
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-		}
-	}
-});
-
-// 토큰 작동
 client.login(token);
