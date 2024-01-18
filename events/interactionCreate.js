@@ -4,7 +4,7 @@ const { Events } = require('discord.js');
 module.exports = {
     name: Events.InteractionCreate, // 사용자가 입력하는 이벤트
     async execute(interaction){
-        
+
         // 이벤트에 관련된 서버정보, 유저정보 등을 가져옴
         // console.log(interaction);
         
